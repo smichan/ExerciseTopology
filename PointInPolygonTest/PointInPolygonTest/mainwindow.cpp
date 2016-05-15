@@ -138,6 +138,8 @@ void MainWindow::testInsideOutside()
 	} else
 	{
 		std::cout << "Polygon and/or X do not exist!" << std::endl;
+		ui->statusBar->clearMessage();
+		ui->statusBar->showMessage("Push the left button and set points in the view & push the left button again!", 5000);
 	}
 }
 
