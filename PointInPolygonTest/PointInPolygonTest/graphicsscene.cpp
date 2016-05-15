@@ -8,6 +8,7 @@ GraphicsScene::GraphicsScene(QObject *parent) :
 	xIsSet = false;
 
 	polygon = this->addPolygon(m_polygon, QPen(Qt::black, 2), QBrush(Qt::blue));
+	//polygon is always behind all objects drawn
 	polygon->setZValue(-1);
 }
 
@@ -15,6 +16,7 @@ GraphicsScene::~GraphicsScene()
 {
 	delete polygon;
 	delete xPoint;
+	clearAndDeletePolygon();
 }
 
 void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -46,6 +48,18 @@ void GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 }
 
+void GraphicsScene::clearAndDeletePolygon()
+{
+	for (QList<QGraphicsItem*>::iterator i = polygonPoints.begin(); i != polygonPoints.end(); ++i)
+	{
+		this->removeItem(*i);
+	}
+	while (polygonPoints.size() != 0)
+	{
+		delete polygonPoints.takeLast();
+	}
+}
+
 void GraphicsScene::drawPolygon()
 {
 	setModeIsActive = false;
@@ -54,18 +68,15 @@ void GraphicsScene::drawPolygon()
 
 	if(drawModeIsActive)
 	{
-		for (QList<QGraphicsItem*>::iterator i = polygonPoints.begin(); i != polygonPoints.end(); ++i)
-		{
-			this->removeItem(*i);
-		}
+		emit(polygonExists(false));
+		clearAndDeletePolygon();
 
 		m_polygon.clear();
-		polygonPoints.clear();
 		polygon->setPolygon(m_polygon);
 
+	} else {
 		emit(polygonExists(false));
 
-	} else {
 		polygon->setPolygon(m_polygon);
 		emit(polygonExists(true));
 		emit(setPolygon(m_polygon));

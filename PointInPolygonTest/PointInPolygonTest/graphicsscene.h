@@ -29,6 +29,7 @@ public:
 	virtual ~GraphicsScene();
 
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+	void clearAndDeletePolygon();
 
 public slots:
 	void drawPolygon();
@@ -42,10 +43,11 @@ signals:
 
 private:
 	QPolygonF m_polygon;
+	QPointF m_xLocation;
+
 	QGraphicsPolygonItem* polygon;
 	QList<QGraphicsItem*> polygonPoints;
 	QGraphicsItem* xPoint;
-	QPointF m_xLocation;
 
 	bool drawModeIsActive;
 	bool setModeIsActive;

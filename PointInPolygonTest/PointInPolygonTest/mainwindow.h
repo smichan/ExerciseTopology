@@ -40,9 +40,7 @@ public slots:
 
 private:
 	Ui::MainWindow *ui;
-
 	GraphicsScene *scene;
-
 	QGraphicsLineItem *xLine;
 
 	bool polygonExists;

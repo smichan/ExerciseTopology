@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 	delete ui;
+	delete scene;
+	delete xLine;
 }
 
 void MainWindow::removeLine(QGraphicsLineItem* line)
@@ -72,7 +74,7 @@ int MainWindow::calculateCrossings()
 			result++;
 		}
 	}
-	std::cout << "There are " << result << " crossings!" << std::endl;
+	std::cout << "There are " << result << " crossings right of X!" << std::endl;
 	if (isInPolygon)
 	{
 		result = 0;
@@ -97,8 +99,6 @@ bool MainWindow::doesCross(QPointF x, QPointF a, QPointF b)
 		if (det == 0)
 		{
 			//x,a,b are on a line
-			//1. case: a.y() ,b.y() are the same, then we say it is always in the polygon. (This also includes the case that a and b are the same!)
-			//2. case: a.y() ,b.y() are really different and x is on the line. Here we assume that it's part of the polygon and we return always 0 (so even number)
 			isInPolygon = true;
 		} else if (det > 0)
 		{
@@ -129,10 +129,10 @@ void MainWindow::testInsideOutside()
 		if (crossings % 2 == 0)
 		{
 			ui->statusBar->clearMessage();
-			ui->statusBar->showMessage("X is outside the polygon! (╯°□°）╯︵ ┻━┻", 5000);
+			ui->statusBar->showMessage("X is outside the polygon! (╯°□°）╯︵ ┻━┻", 3000);
 		} else {
 			ui->statusBar->clearMessage();
-			ui->statusBar->showMessage("X is inside the polygon! ¯\\_(ツ)_/¯", 5000);
+			ui->statusBar->showMessage("X is inside the polygon! ¯\\_(ツ)_/¯", 3000);
 		}
 
 	} else
