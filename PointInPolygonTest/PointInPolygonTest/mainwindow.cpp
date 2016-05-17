@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->graphicsView->setScene(scene);
 	ui->graphicsView->setSceneRect(0,0,300,200);
 
+
 	XExists = false;
 	polygonExists = false;
 	lineIsSet = false;
