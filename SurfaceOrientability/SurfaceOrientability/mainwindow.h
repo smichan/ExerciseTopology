@@ -25,7 +25,7 @@ public:
 	bool isOrientable();
 	bool isOrientableForTriangle(int k, int adjacentTriangle);
 	bool swapOrientationForAdjacentTriangles(int k, std::vector<int> &visitStack);
-	bool canBeFlipped(int adjacentTriangle);
+	bool canBeFlipped(int k);
 
 	void rotateTriangle(int k);
 
@@ -33,6 +33,8 @@ public:
 public slots:
 
 	void checkTriangulation();
+	void setMobiusInput();
+	void setRingInput();
 
 private:
 	Ui::MainWindow *ui;
