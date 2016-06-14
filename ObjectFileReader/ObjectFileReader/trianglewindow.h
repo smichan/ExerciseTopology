@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <QFile>
+#include <QTime>
 
 
 
@@ -18,22 +19,42 @@ class TriangleWindow : public OpenGLWindow
 {
 public:
 	TriangleWindow(QString fileName);
+	~TriangleWindow();
 
 	void initialize() Q_DECL_OVERRIDE;
 	void render() Q_DECL_OVERRIDE;
 
+	void initializeRender();
+
 	void readFile(QString fileName);
+	void calculateSimplices();
+	void drawConnectedComponent(std::vector<int> &visitStack, int triangle);
+	void addToTrianglesAndEdges(int triangle);
+	void setSameTrianglesToNeg(std::vector<int> &sharesA, std::vector<int> &sharesB, std::vector<int> &sharesC);
+	void setColor();
+	std::vector<int> findAdjacentTriangles(int k);
+	std::vector<int> sharePoint(int p);
+	std::vector<int> commonEdges(std::vector<int> &pointsA, std::vector<int> &pointsB, int k);
 
 private:
-	GLuint m_posAttr;
-	GLuint m_colAttr;
+	GLuint vertBuffer;
+	GLuint colBuffer;
+	GLuint indBuffer;
 	GLuint m_matrixUniform;
 
 	QOpenGLShaderProgram *m_program;
 	int m_frame;
 	std::vector<float> vertices;
-	std::vector<float> colors;
 	std::vector<int> indices;
+
+	std::vector<float> triangles;
+	std::vector<float> edges;
+	std::vector<float> edgeColors;
+	std::vector<float> colors;
+
+	bool* visited;
+	int countEdges;
+	float r, g, b;
 };
 
 
