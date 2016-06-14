@@ -30,8 +30,9 @@ public:
 	void calculateSimplices();
 	void drawConnectedComponent(std::vector<int> &visitStack, int triangle);
 	void addToTrianglesAndEdges(int triangle);
-	void setSameTrianglesToNeg(std::vector<int> &sharesA, std::vector<int> &sharesB, std::vector<int> &sharesC);
 	void setColor();
+	void joinEdgesAndTriangles();
+	void calculateEdges();
 	std::vector<int> findAdjacentTriangles(int k);
 	std::vector<int> sharePoint(int p);
 	std::vector<int> commonEdges(std::vector<int> &pointsA, std::vector<int> &pointsB, int k);
@@ -44,6 +45,7 @@ private:
 
 	QOpenGLShaderProgram *m_program;
 	int m_frame;
+	int lineSegments, triangleFaces;
 	std::vector<float> vertices;
 	std::vector<int> indices;
 
@@ -53,7 +55,7 @@ private:
 	std::vector<float> colors;
 
 	bool* visited;
-	int countEdges;
+	int countAdjacent;
 	float r, g, b;
 };
 

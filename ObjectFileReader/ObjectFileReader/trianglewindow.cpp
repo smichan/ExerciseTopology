@@ -4,8 +4,13 @@ TriangleWindow::TriangleWindow(QString fileName)
 	: m_program(0)
 	, m_frame(0)
 {
+	countAdjacent = 0;
 	readFile(fileName);
 	calculateSimplices();
+
+	lineSegments = edges.size()/3;
+	triangleFaces = triangles.size()/3;
+	joinEdgesAndTriangles();
 }
 
 TriangleWindow::~TriangleWindow()
@@ -42,6 +47,7 @@ void TriangleWindow::render()
 	matrix.perspective(60.0f, 4.0f/3.0f, 0.1f, 100.0f);
 	matrix.translate(0, 0, -2);
 	matrix.rotate(100.0f * m_frame / screen()->refreshRate(), 0, 1, 0);
+	matrix.scale(1.0);
 
 	m_program->setUniformValue(m_matrixUniform, matrix);
 
@@ -51,14 +57,15 @@ void TriangleWindow::render()
 	colBuffer = m_program->attributeLocation("colAttr");
 	glVertexAttribPointer(colBuffer, 3, GL_FLOAT, GL_FALSE, 0, &colors[0]);
 
-
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	glDrawArrays(GL_TRIANGLES, 0, triangles.size()/3);
+	glDrawArrays(GL_TRIANGLES, 0, triangleFaces);
+	glDrawArrays(GL_LINES, triangleFaces, lineSegments);
 
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
+
 
 	m_program->release();
 
@@ -108,14 +115,13 @@ void TriangleWindow::calculateSimplices()
 	if (indices.size() > 0)
 	{
 		std::vector<int> visitStack;
-		countEdges = 0;
 		visited = new bool[indices.size()/3];
 
-		for (int i = 0; i < indices.size()/3; i++)
+		for (unsigned int i = 0; i < indices.size()/3; i++)
 		{
 			visited[i] = false;
 		}
-		for (int j = 0; j < indices.size()/3; j++)
+		for (unsigned int j = 0; j < indices.size()/3; j++)
 		{
 			if(!visited[j] && indices[j*3] >= 0)
 			{
@@ -124,7 +130,7 @@ void TriangleWindow::calculateSimplices()
 			}
 		}
 	}
-	std::cout << "There are " << triangles.size()/9 << " triangle faces and " << countEdges << " edge faces." << std::endl;
+	std::cout << "There are " << triangles.size()/9 << " triangle faces and " << edges.size()/6 - countAdjacent/2 << " edge faces." << std::endl;
 }
 
 void TriangleWindow::drawConnectedComponent(std::vector<int> &visitStack, int triangle)
@@ -132,6 +138,7 @@ void TriangleWindow::drawConnectedComponent(std::vector<int> &visitStack, int tr
 	visited[triangle] = true;
 
 	std::vector<int> adjacentTriangles = findAdjacentTriangles(triangle);
+	countAdjacent += adjacentTriangles.size();
 	addToTrianglesAndEdges(triangle);
 
 	foreach (int i, adjacentTriangles)
@@ -150,10 +157,6 @@ void TriangleWindow::drawConnectedComponent(std::vector<int> &visitStack, int tr
 			{
 				drawConnectedComponent(visitStack, nextTriangle);
 			}
-			else
-			{
-
-			}
 		}
 	}
 
@@ -171,15 +174,13 @@ void TriangleWindow::addToTrianglesAndEdges(int triangle)
 	triangles.push_back(vertices[indices[triangle*3+2]*3+1]);
 	triangles.push_back(vertices[indices[triangle*3+2]*3+2]);
 
-	colors.push_back(r);
-	colors.push_back(g);
-	colors.push_back(b);
-	colors.push_back(r);
-	colors.push_back(g);
-	colors.push_back(b);
-	colors.push_back(r);
-	colors.push_back(g);
-	colors.push_back(b);
+	while (colors.size() < triangles.size())
+	{
+		colors.push_back(r);
+		colors.push_back(g);
+		colors.push_back(b);
+	}
+
 
 	edges.push_back(vertices[indices[triangle*3]*3]);
 	edges.push_back(vertices[indices[triangle*3]*3+1]);
@@ -187,51 +188,22 @@ void TriangleWindow::addToTrianglesAndEdges(int triangle)
 	edges.push_back(vertices[indices[triangle*3+1]*3]);
 	edges.push_back(vertices[indices[triangle*3+1]*3+1]);
 	edges.push_back(vertices[indices[triangle*3+1]*3+2]);
+	edges.push_back(vertices[indices[triangle*3+1]*3]);
+	edges.push_back(vertices[indices[triangle*3+1]*3+1]);
+	edges.push_back(vertices[indices[triangle*3+1]*3+2]);
 	edges.push_back(vertices[indices[triangle*3+2]*3]);
 	edges.push_back(vertices[indices[triangle*3+2]*3+1]);
 	edges.push_back(vertices[indices[triangle*3+2]*3+2]);
+	edges.push_back(vertices[indices[triangle*3+2]*3]);
+	edges.push_back(vertices[indices[triangle*3+2]*3+1]);
+	edges.push_back(vertices[indices[triangle*3+2]*3+2]);
+	edges.push_back(vertices[indices[triangle*3]*3]);
+	edges.push_back(vertices[indices[triangle*3]*3+1]);
+	edges.push_back(vertices[indices[triangle*3]*3+2]);
 
-
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-	edgeColors.push_back(1.0);
-}
-
-void TriangleWindow::setSameTrianglesToNeg(std::vector<int> &sharesA, std::vector<int> &sharesB, std::vector<int> &sharesC)
-{
-	for (int i = 0; i < sharesA.size(); i++)
+	while (edgeColors.size() < edges.size())
 	{
-		for (int j = 0; j < sharesB.size(); j++)
-		{
-			if (sharesA[i] == sharesB[j])
-			{
-				for (int k = 0; k < sharesC.size(); k++)
-				{
-					if (sharesA[i] == sharesC[k] && sharesC[k] == sharesB[j])
-					{
-						// das geht zwar schöner, aber es funktioniert.
-						// share-Vektoren werden auf ungültige unterschiedliche Werte gesetzt und
-						// in indices werden die Werte auf -1 gesetzt, um direkt darauf prüfen zu können,
-						// z.B. in sharePoint(int a)
-						if (!visited[sharesA[i]])
-						{
-							indices[3*sharesA[i]] = -1;
-							indices[3*sharesA[i]+1] = -1;
-							indices[3*sharesA[i]+2] = -1;
-						}
-						sharesA[i] = -2;
-						sharesB[j] = -3;
-						sharesC[k] = -4;
-					}
-				}
-			}
-		}
+		edgeColors.push_back(1.0);
 	}
 }
 
@@ -245,6 +217,17 @@ void TriangleWindow::setColor()
 	b = (qrand()%number)/(float)number;
 }
 
+void TriangleWindow::joinEdgesAndTriangles()
+{
+	triangles.insert(triangles.end(), edges.begin(), edges.end());
+	colors.insert(colors.end(), edgeColors.begin(), edgeColors.end());
+}
+
+void TriangleWindow::calculateEdges()
+{
+
+}
+
 std::vector<int> TriangleWindow::findAdjacentTriangles(int k)
 {
 	std::vector<int> triangles;
@@ -256,8 +239,6 @@ std::vector<int> TriangleWindow::findAdjacentTriangles(int k)
 	std::vector<int> sharesA = sharePoint(a);
 	std::vector<int> sharesB = sharePoint(b);
 	std::vector<int> sharesC = sharePoint(c);
-
-	setSameTrianglesToNeg(sharesA, sharesB, sharesC);
 
 	std::vector<int> sharesAB = commonEdges(sharesA, sharesB, k);
 	std::vector<int> sharesAC = commonEdges(sharesA, sharesC, k);

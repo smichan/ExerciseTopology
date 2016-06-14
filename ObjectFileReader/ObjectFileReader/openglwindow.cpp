@@ -102,6 +102,15 @@ void OpenGLWindow::renderNow()
 		renderLater();
 }
 
+void OpenGLWindow::mouseMoveEvent(QMouseEvent *eve)
+{
+
+}
+
+void OpenGLWindow::wheelEvent(QWheelEvent *eve)
+{
+}
+
 void OpenGLWindow::setAnimating(bool animating)
 {
 	m_animating = animating;
