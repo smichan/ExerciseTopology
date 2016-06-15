@@ -243,12 +243,6 @@ void TriangleWindow::joinEdgesAndTriangles()
 	colors.insert(colors.end(), edgeColors.begin(), edgeColors.end());
 }
 
-void TriangleWindow::calculateEdges()
-{
-
-}
-
-
 void TriangleWindow::setScalingFactor(int i)
 {
 

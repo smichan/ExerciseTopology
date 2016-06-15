@@ -34,7 +34,6 @@ public:
 	void addToTrianglesAndEdges(int triangle);
 	void setColor();
 	void joinEdgesAndTriangles();
-	void calculateEdges();
 	void setScalingFactor(int i);
 	void calculateObjectCenter();
 	std::vector<int> findAdjacentTriangles(int k);
