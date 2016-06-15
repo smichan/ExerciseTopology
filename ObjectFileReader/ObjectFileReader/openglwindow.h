@@ -2,9 +2,13 @@
 #define OPENGLWINDOW_H
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLPaintDevice>
+#include <QtGui/QPainter>
 #include <QMouseEvent>
 #include <QWheelEvent>
-
+#include <iostream>
 
 class QPainter;
 class QOpenGLContext;
@@ -29,8 +33,8 @@ public slots:
 	void renderNow();
 
 protected:
-	void mouseMoveEvent(QMouseEvent* eve);
-	void wheelEvent(QWheelEvent* eve);
+	virtual void mouseMoveEvent(QMouseEvent* eve);
+	virtual void wheelEvent(QWheelEvent* eve);
 	bool event(QEvent *event) Q_DECL_OVERRIDE;
 
 	void exposeEvent(QExposeEvent *event) Q_DECL_OVERRIDE;

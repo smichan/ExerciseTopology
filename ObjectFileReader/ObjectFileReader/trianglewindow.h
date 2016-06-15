@@ -11,18 +11,20 @@
 #include <QFile>
 #include <QTime>
 
-
-
 using namespace std;
 
 class TriangleWindow : public OpenGLWindow
 {
+	Q_OBJECT
 public:
 	TriangleWindow(QString fileName);
 	~TriangleWindow();
 
 	void initialize() Q_DECL_OVERRIDE;
 	void render() Q_DECL_OVERRIDE;
+
+	void mouseMoveEvent(QMouseEvent* eve) Q_DECL_OVERRIDE;
+	void wheelEvent(QWheelEvent* eve) Q_DECL_OVERRIDE;
 
 	void initializeRender();
 
@@ -33,11 +35,15 @@ public:
 	void setColor();
 	void joinEdgesAndTriangles();
 	void calculateEdges();
+	void setScalingFactor(int i);
+	void calculateObjectCenter();
 	std::vector<int> findAdjacentTriangles(int k);
 	std::vector<int> sharePoint(int p);
 	std::vector<int> commonEdges(std::vector<int> &pointsA, std::vector<int> &pointsB, int k);
 
 private:
+	QMatrix4x4 matrix;
+
 	GLuint vertBuffer;
 	GLuint colBuffer;
 	GLuint indBuffer;
@@ -46,6 +52,7 @@ private:
 	QOpenGLShaderProgram *m_program;
 	int m_frame;
 	int lineSegments, triangleFaces;
+
 	std::vector<float> vertices;
 	std::vector<int> indices;
 
@@ -55,6 +62,7 @@ private:
 	std::vector<float> colors;
 
 	bool* visited;
+	float xCenter, yCenter, zDepth;
 	int countAdjacent;
 	float r, g, b;
 };

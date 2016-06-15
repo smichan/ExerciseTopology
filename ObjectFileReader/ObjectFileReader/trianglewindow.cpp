@@ -6,6 +6,7 @@ TriangleWindow::TriangleWindow(QString fileName)
 {
 	countAdjacent = 0;
 	readFile(fileName);
+	calculateObjectCenter();
 	calculateSimplices();
 
 	lineSegments = edges.size()/3;
@@ -32,6 +33,11 @@ void TriangleWindow::initialize()
 	vertBuffer = m_program->attributeLocation("posAttr");
 	colBuffer = m_program->attributeLocation("colAttr");
 
+	matrix.perspective(60.0f, 4.0f/3.0f, 0.1f, 100.0f);
+
+	matrix.translate(-xCenter, -yCenter, (-zDepth-2.5));
+
+
 }
 
 
@@ -43,12 +49,7 @@ void TriangleWindow::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_program->bind();
 
-	QMatrix4x4 matrix;
-	matrix.perspective(60.0f, 4.0f/3.0f, 0.1f, 100.0f);
-	matrix.translate(0, 0, -2);
-	matrix.rotate(100.0f * m_frame / screen()->refreshRate(), 0, 1, 0);
-	matrix.scale(1.0);
-
+	//matrix.rotate(100.0f * m_frame / screen()->refreshRate(), 0, 1, 0);
 	m_program->setUniformValue(m_matrixUniform, matrix);
 
 	vertBuffer = m_program->attributeLocation("posAttr");
@@ -70,6 +71,25 @@ void TriangleWindow::render()
 	m_program->release();
 
 	++m_frame;
+}
+
+void TriangleWindow::mouseMoveEvent(QMouseEvent *eve)
+{
+	if(eve->buttons() == Qt::LeftButton)
+	{
+	}
+}
+
+void TriangleWindow::wheelEvent(QWheelEvent *eve)
+{
+
+	// actual widget position
+	int widx = eve->x();
+	int widy = eve->y();
+
+	int delta = eve->delta();
+
+	setScalingFactor(delta);
 }
 
 void TriangleWindow::readFile(QString fileName)
@@ -228,6 +248,49 @@ void TriangleWindow::calculateEdges()
 
 }
 
+
+void TriangleWindow::setScalingFactor(int i)
+{
+
+	if (i < 0)
+	{
+		matrix.translate(0,0,0.1);
+
+	}
+	else
+	{
+		matrix.translate(0,0,-0.1);
+	}
+}
+
+void TriangleWindow::calculateObjectCenter()
+{
+	float boundaries[6] = {0,0,0,0,0,0};
+	for(int i = 3; i < vertices.size(); i+=3)
+	{
+		for (int j = 0; j < 3; j++)
+		if (vertices[i+j] < boundaries[0+2*j])
+		{
+			boundaries[0+2*j] = vertices[i+j];
+		}
+		else if (vertices[i+j] > boundaries[1+2*j])
+		{
+			boundaries[1+2*j] = vertices[i+j];
+		}
+	}
+	std::cout << "Boundaries are ";
+	for (int i= 0; i < 6; i++)
+	{
+		std::cout << boundaries[i] << ", ";
+	}
+	std::cout << std::endl;
+
+	xCenter = (boundaries[0]+boundaries[1])/2;
+	yCenter = (boundaries[2]+boundaries[3])/2;
+	zDepth = boundaries[4]+boundaries[5];
+
+
+}
 std::vector<int> TriangleWindow::findAdjacentTriangles(int k)
 {
 	std::vector<int> triangles;
@@ -280,3 +343,4 @@ std::vector<int> TriangleWindow::commonEdges(std::vector<int> &pointsA, std::vec
 	}
 	return cutSet;
 }
+

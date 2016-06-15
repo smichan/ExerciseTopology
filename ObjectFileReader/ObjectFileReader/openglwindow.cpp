@@ -1,12 +1,5 @@
 #include "openglwindow.h"
 
-#include <QtCore/QCoreApplication>
-
-
-#include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLPaintDevice>
-#include <QtGui/QPainter>
-
 OpenGLWindow::OpenGLWindow(QWindow *parent)
 	: QWindow(parent)
 	, m_update_pending(false)
@@ -16,6 +9,7 @@ OpenGLWindow::OpenGLWindow(QWindow *parent)
 {
 
 	setSurfaceType(QWindow::OpenGLSurface);
+
 }
 
 OpenGLWindow::~OpenGLWindow()
@@ -109,6 +103,7 @@ void OpenGLWindow::mouseMoveEvent(QMouseEvent *eve)
 
 void OpenGLWindow::wheelEvent(QWheelEvent *eve)
 {
+
 }
 
 void OpenGLWindow::setAnimating(bool animating)
